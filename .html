@@ -1,0 +1,149 @@
+<p/>selling lemonade 
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Page</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="payment-container">
+        <h2>Make a Payment</h2>
+        <form id="payment-form">
+            <label for="card">Card Number:</label>
+            <input type="text" id="card" placeholder="XXXX-XXXX-XXXX-XXXX">
+            <label for="amount">Amount:</label>
+            <input type="number" id="amount" placeholder="$">
+            <button type="submit">Pay Now</button>
+        </form>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
+
+
+
+
+
+
+
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+    var stripe = Stripe('your_public_key_here');
+    var elements = stripe.elements();
+    
+    var card = elements.create('card');
+    card.mount('#card-element');
+
+    document.getElementById('payment-form').addEventListener('submit', async function(event) {
+        event.preventDefault();
+        
+        const {token, error} = await stripe.createToken(card);
+        if (error) {
+            alert(error.message);
+            return;
+        }
+
+        fetch('/pay', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({token: token.id, amount: document.getElementById('amount').value})
+        }).then(response => response.json())
+        .then(data => alert(data.message));
+    });
+</script>
+
+
+
+
+
+
+
+
+
+
+
+<script src="https://js.stripe.com/v3/"></script>
+<button id="apple-pay-button">Pay with Apple Pay</button>
+
+<script>
+    var stripe = Stripe('your_public_key_here');
+    var paymentRequest = stripe.paymentRequest({
+        country: 'US',
+        currency: 'usd',
+        total: { label: 'Total', amount: 1000 },
+        requestPayerEmail: true
+    });
+
+    var prButton = elements.create('paymentRequestButton', { paymentRequest: paymentRequest });
+    paymentRequest.canMakePayment().then(result => {
+        if (result) prButton.mount('#apple-pay-button');
+    });
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+    var paymentRequest = stripe.paymentRequest({
+        country: 'US',
+        currency: 'usd',
+        total: { label: 'Total', amount: 1000 },
+        requestPayerEmail: true,
+        requestPayerName: true
+    });
+
+    var prButton = elements.create('paymentRequestButton', { paymentRequest: paymentRequest });
+    paymentRequest.canMakePayment().then(result => {
+        if (result) prButton.mount('#google-pay-button');
+    });
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script src="https://cdn.affirm.com/js/v2/affirm.js"></script>
+<script>
+    affirm.checkout({
+        amount: 5000,  // Convert dollars to cents
+        currency: "USD"
+    });
+</script>
+
+
+
+
+
+
+
+
+
